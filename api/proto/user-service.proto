@@ -1,0 +1,57 @@
+syntax = "proto3";
+package api;
+
+message User {
+    int64 id = 1; // User ID
+    string name = 2; // User Name
+    int64 age = 3; // User Age
+    string mail = 4; // User mail address
+    string address = 5; // User Address
+}
+
+message CreateRequest {
+    User user = 1;
+}
+
+message CreateResponse {
+    int64 id = 1;
+}
+
+message GetRequest {
+    int64 id = 1;
+}
+
+message GetResponse {
+    User user = 1;
+}
+
+message UpdateRequest {
+    User user = 1;
+}
+
+message UpdateResponse {
+    int64 updated = 1;
+}
+
+message DeleteRequest {
+    int64 id = 1;
+}
+
+message DeleteResponse {
+    int64 deleted = 1;
+}
+
+message GetAllRequest{}
+
+message GetAllResponse {
+    repeated User users = 1;
+}
+
+service UserService {
+    rpc Create(CreateRequest) returns (CreateResponse);
+    rpc Get(GetRequest) returns (GetResponse);
+    rpc Update(UpdateRequest) returns (UpdateResponse);
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+}
+

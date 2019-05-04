@@ -1,0 +1,59 @@
+syntax = "proto3";
+package api;
+
+message Account {
+    int64 account_id = 1; // Account ID
+    string date = 2; // Account Inserted Date
+    int64 store_id = 3; // Account Store ID
+    message Detail {
+        int64 item_id = 1;
+    }
+    repeated Detail details = 4;
+}
+
+message CreateRequest {
+    Account account = 1;
+}
+
+message CreateResponse {
+    int64 id = 1;
+}
+
+message GetRequest {
+    int64 id = 1;
+}
+
+message GetResponse {
+    Account account = 1;
+}
+
+message UpdateRequest {
+    Account account = 1;
+}
+
+message UpdateResponse {
+    int64 updated = 1;
+}
+
+message DeleteRequest {
+    int64 id = 1;
+}
+
+message DeleteResponse {
+    int64 deleted = 1;
+}
+
+message GetAllRequest{}
+
+message GetAllResponse {
+    repeated Account accounts = 1;
+}
+
+service AccountService {
+    rpc Create(CreateRequest) returns (CreateResponse);
+    rpc Get(GetRequest) returns (GetResponse);
+    rpc Update(UpdateRequest) returns (UpdateResponse);
+    rpc Delete(DeleteRequest) returns (DeleteResponse);
+    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+}
+
