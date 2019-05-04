@@ -28,7 +28,7 @@ func (s *server) connect(ctx context.Context) (*sql.Conn, error) {
 	return c, nil
 }
 
-func (s *server) Create(ctx context.Context, req *api.CreateRequest) (*api.CreateResponse, error) {
+func (s *server) Create(ctx context.Context, req *api.CreateUserRequest) (*api.CreateUserResponse, error) {
 	c, err := s.connect(ctx)
 	if err != nil {
 		return nil, err
@@ -47,10 +47,10 @@ func (s *server) Create(ctx context.Context, req *api.CreateRequest) (*api.Creat
 		return nil, status.Error(codes.Unknown, "failed to retrieve user id"+err.Error())
 	}
 
-	return &api.CreateResponse{Id: id}, nil
+	return &api.CreateUserResponse{Id: id}, nil
 }
 
-func (s *server) Get(ctx context.Context, req *api.GetRequest) (*api.GetResponse, error) {
+func (s *server) Get(ctx context.Context, req *api.GetUserRequest) (*api.GetUserResponse, error) {
 	c, err := s.connect(ctx)
 	if err != nil {
 		return nil, err
@@ -78,10 +78,10 @@ func (s *server) Get(ctx context.Context, req *api.GetRequest) (*api.GetResponse
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	return &api.GetResponse{User: &user}, nil
+	return &api.GetUserResponse{User: &user}, nil
 }
 
-func (s *server) Update(ctx context.Context, req *api.UpdateRequest) (*api.UpdateResponse, error) {
+func (s *server) Update(ctx context.Context, req *api.UpdateUserRequest) (*api.UpdateUserResponse, error) {
 	c, err := s.connect(ctx)
 	if err != nil {
 		return nil, err
@@ -105,5 +105,5 @@ func (s *server) Update(ctx context.Context, req *api.UpdateRequest) (*api.Updat
 			fmt.Sprintf("user id %d is not found", req.User.Id))
 	}
 
-	return &api.UpdateResponse{Updated: rows}, nil
+	return &api.UpdateUserResponse{Updated: rows}, nil
 }

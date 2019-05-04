@@ -11,49 +11,49 @@ message Account {
     repeated Detail details = 4;
 }
 
-message CreateRequest {
+message CreateAccountRequest {
     Account account = 1;
 }
 
-message CreateResponse {
+message CreateAccountResponse {
     int64 id = 1;
 }
 
-message GetRequest {
+message GetAccountRequest {
     int64 id = 1;
 }
 
-message GetResponse {
+message GetAccountResponse {
     Account account = 1;
 }
 
-message UpdateRequest {
+message UpdateAccountRequest {
     Account account = 1;
 }
 
-message UpdateResponse {
+message UpdateAccountResponse {
     int64 updated = 1;
 }
 
-message DeleteRequest {
+message DeleteAccountRequest {
     int64 id = 1;
 }
 
-message DeleteResponse {
+message DeleteAccountResponse {
     int64 deleted = 1;
 }
 
-message GetAllRequest{}
+message GetAllAccountRequest{}
 
-message GetAllResponse {
+message GetAllAccountResponse {
     repeated Account accounts = 1;
 }
 
 service AccountService {
-    rpc Create(CreateRequest) returns (CreateResponse);
-    rpc Get(GetRequest) returns (GetResponse);
-    rpc Update(UpdateRequest) returns (UpdateResponse);
-    rpc Delete(DeleteRequest) returns (DeleteResponse);
-    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+    rpc Create(CreateAccountRequest) returns (CreateAccountResponse);
+    rpc Get(GetAccountRequest) returns (GetAccountResponse);
+    rpc Update(UpdateAccountRequest) returns (UpdateAccountResponse);
+    rpc Delete(DeleteAccountRequest) returns (DeleteAccountResponse);
+    rpc GetAll(GetAllAccountRequest) returns (GetAllAccountResponse);
 }
 

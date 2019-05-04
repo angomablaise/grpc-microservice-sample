@@ -9,49 +9,49 @@ message User {
     string address = 5; // User Address
 }
 
-message CreateRequest {
+message CreateUserRequest {
     User user = 1;
 }
 
-message CreateResponse {
+message CreateUserResponse {
     int64 id = 1;
 }
 
-message GetRequest {
+message GetUserRequest {
     int64 id = 1;
 }
 
-message GetResponse {
+message GetUserResponse {
     User user = 1;
 }
 
-message UpdateRequest {
+message UpdateUserRequest {
     User user = 1;
 }
 
-message UpdateResponse {
+message UpdateUserResponse {
     int64 updated = 1;
 }
 
-message DeleteRequest {
+message DeleteUserRequest {
     int64 id = 1;
 }
 
-message DeleteResponse {
+message DeleteUserResponse {
     int64 deleted = 1;
 }
 
-message GetAllRequest{}
+message GetAllUserRequest{}
 
-message GetAllResponse {
+message GetAllUserResponse {
     repeated User users = 1;
 }
 
 service UserService {
-    rpc Create(CreateRequest) returns (CreateResponse);
-    rpc Get(GetRequest) returns (GetResponse);
-    rpc Update(UpdateRequest) returns (UpdateResponse);
-    rpc Delete(DeleteRequest) returns (DeleteResponse);
-    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+    rpc Create(CreateUserRequest) returns (CreateUserResponse);
+    rpc Get(GetUserRequest) returns (GetUserResponse);
+    rpc Update(UpdateUserRequest) returns (UpdateUserResponse);
+    rpc Delete(DeleteUserRequest) returns (DeleteUserResponse);
+    rpc GetAll(GetAllUserRequest) returns (GetAllUserResponse);
 }
 

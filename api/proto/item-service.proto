@@ -8,49 +8,49 @@ message Item {
     int64 price = 4; // item price
 }
 
-message CreateRequest {
+message CreateItemRequest {
     Item item = 1;
 }
 
-message CreateResponse {
+message CreateItemResponse {
     int64 id = 1;
 }
 
-message GetRequest {
+message GetItemRequest {
     int64 id = 1;
 }
 
-message GetResponse {
+message GetItemResponse {
     Item item = 1;
 }
 
-message UpdateRequest {
+message UpdateItemRequest {
     Item item = 1;
 }
 
-message UpdateResponse {
+message UpdateItemResponse {
     int64 updated = 1;
 }
 
-message DeleteRequest {
+message DeleteItemRequest {
     int64 id = 1;
 }
 
-message DeleteResponse {
+message DeleteItemResponse {
     int64 deleted = 1;
 }
 
-message GetAllRequest{}
+message GetAllItemRequest{}
 
-message GetAllResponse {
+message GetAllItemResponse {
     repeated Item items = 1;
 }
 
 service ItemService {
-    rpc Create(CreateRequest) returns (CreateResponse);
-    rpc Get(GetRequest) returns (GetResponse);
-    rpc Update(UpdateRequest) returns (UpdateResponse);
-    rpc Delete(DeleteRequest) returns (DeleteResponse);
-    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+    rpc Create(CreateItemRequest) returns (CreateItemResponse);
+    rpc Get(GetItemRequest) returns (GetItemResponse);
+    rpc Update(UpdateItemRequest) returns (UpdateItemResponse);
+    rpc Delete(DeleteItemRequest) returns (DeleteItemResponse);
+    rpc GetAll(GetAllItemRequest) returns (GetAllItemResponse);
 }
 

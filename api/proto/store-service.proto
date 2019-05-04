@@ -8,49 +8,49 @@ message Store {
     string address = 5; // Store Address
 }
 
-message CreateRequest {
+message CreateStoreRequest {
     Store store = 1;
 }
 
-message CreateResponse {
+message CreateStoreResponse {
     int64 id = 1;
 }
 
-message GetRequest {
+message GetStoreRequest {
     int64 id = 1;
 }
 
-message GetResponse {
+message GetStoreResponse {
     Store store = 1;
 }
 
-message UpdateRequest {
+message UpdateStoreRequest {
     Store store = 1;
 }
 
-message UpdateResponse {
+message UpdateStoreResponse {
     int64 updated = 1;
 }
 
-message DeleteRequest {
+message DeleteStoreRequest {
     int64 id = 1;
 }
 
-message DeleteResponse {
+message DeleteStoreResponse {
     int64 deleted = 1;
 }
 
-message GetAllRequest{}
+message GetAllStoreRequest{}
 
-message GetAllResponse {
+message GetAllStoreResponse {
     repeated Store stores = 1;
 }
 
 service StoreService {
-    rpc Create(CreateRequest) returns (CreateResponse);
-    rpc Get(GetRequest) returns (GetResponse);
-    rpc Update(UpdateRequest) returns (UpdateResponse);
-    rpc Delete(DeleteRequest) returns (DeleteResponse);
-    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+    rpc Create(CreateStoreRequest) returns (CreateStoreResponse);
+    rpc Get(GetStoreRequest) returns (GetStoreResponse);
+    rpc Update(UpdateStoreRequest) returns (UpdateStoreResponse);
+    rpc Delete(DeleteStoreRequest) returns (DeleteStoreResponse);
+    rpc GetAll(GetAllStoreRequest) returns (GetAllStoreResponse);
 }
 
