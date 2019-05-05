@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql" // Register MySQL Driver
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
+	repo "github.com/smockoro/grpc-microservice-sample/pkg/repository/mysql/user"
 	"github.com/smockoro/grpc-microservice-sample/pkg/service/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -42,7 +43,8 @@ func RunServer() error {
 	}
 	defer db.Close()
 
-	server := user.NewUserServiceServer(db)
+	repo := repo.NewUserRepository(db)
+	server := user.NewUserServiceServer(repo)
 	s := grpc.NewServer()
 
 	api.RegisterUserServiceServer(s, server)
