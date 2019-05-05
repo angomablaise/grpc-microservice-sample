@@ -58,7 +58,7 @@ func (s *server) Get(ctx context.Context, req *api.GetUserRequest) (*api.GetUser
 	defer c.Close()
 
 	res, err := c.QueryContext(ctx,
-		"SELECT `id`, `name`, `age`, `mail`, `address`) FROM users WHERE `id` = ?",
+		"SELECT `id`, `name`, `age`, `mail`, `address` FROM users WHERE `id` = ?",
 		req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to select operation"+err.Error())
