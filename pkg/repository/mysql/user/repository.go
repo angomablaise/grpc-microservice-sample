@@ -72,12 +72,18 @@ func (u *userRepository) SelectByID(ctx context.Context, id int64) (*api.User, e
 			id))
 	}
 
-	var user *api.User
+	var user api.User
 	if err := res.Scan(&user.Id, &user.Name, &user.Age, &user.Mail, &user.Address); err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	return user, nil
+	return &api.User{
+		Id:      user.Id,
+		Name:    user.Name,
+		Age:     user.Age,
+		Mail:    user.Mail,
+		Address: user.Address,
+	}, nil
 }
 
 func (u *userRepository) SelectAll(ctx context.Context) ([]*api.User, error) {

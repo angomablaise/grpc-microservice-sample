@@ -1,0 +1,128 @@
+syntax = "proto3";
+package api;
+
+
+import "google/api/annotations.proto";
+
+// bookのデータをやり取りするためのメッセージ
+message book {
+    // 一意に振られるid
+    int64 id = 1;
+
+    // 書籍のタイトル
+    string title = 2;
+
+    // 著者
+    string author = 3;
+ 
+    // 書籍の詳細
+    string description = 4;
+    
+    // ページ数
+    int64 pages = 5;
+    
+    // 値段
+    int64 price = 6;
+}
+
+// 本の情報を新しく作る時のメッセージ
+message CreateRequest{
+    // 書籍情報を追加する
+    book book = 1;
+}
+
+// 書籍情報作成時のレスポンスメッセージ
+message CreateResponse{
+    // 作成された書籍情報のID
+    int64 id = 1;
+}
+
+// 書籍情報をID指定で取得する時のメッセージ
+message GetRequest{
+    // 取得したい書籍のID
+    int64 id = 1;
+}
+
+// 書籍情報をIDで取得する場合のレスポンス
+message GetResponse{
+    // 取得した書籍情報
+    book book = 1;
+}
+
+// 書籍情報を更新する場合のメッセージ
+message UpdateRequest{
+    // 更新したい書籍のデータ
+    book book = 1;
+}
+
+// 書籍情報を更新した時のレスポンス
+message UpdateResponse{
+    // 更新件数
+    int64 updated = 1;
+}
+
+// 書籍情報を削除する場合のメッセージ
+message DeleteRequest{
+    // 削除する書籍のID
+    int64 id = 1;
+}
+
+// 書籍情報を削除した時のレスポンス
+message DeleteResponse{
+    // 削除した件数を返します
+    int64 deleted = 1;
+}
+
+// 全件取得する場合のメッセージ
+message GetAllRequest{}
+
+// 書籍情報を全件取得した時のレスポンス
+message GetAllResponse{
+    // List形式で書籍情報を返す
+    repeated book books = 1;
+}
+
+// gRPCのサービス用
+service BookService {
+    // 書籍情報の全件取得用のRPCメソッド
+    rpc GetAll(GetAllRequest) returns (GetAllResponse){
+        option (google.api.http) = {
+            get: "/book/all"
+        };
+    }
+
+    // 書籍情報作成用のRPCメソッド
+    rpc Create(CreateRequest) returns (CreateResponse){
+        option (google.api.http) = {
+            post: "/book"
+            body: "*"
+        };
+    }
+
+    // 書籍情報１件取得用のRPCメソッド
+    rpc Get(GetRequest) returns (GetResponse){
+        option (google.api.http) = {
+            get: "/book/{id}"
+        };
+    }
+
+    // 書籍情報の更新用のRPCメソッド
+    rpc Update(UpdateRequest) returns (UpdateResponse){
+        option (google.api.http) = {
+            put: "/book/{book.id}"
+            body: "*"
+
+            additional_bindings {
+                patch: "/book/{book.id}"
+                body: "*"
+            }
+        };
+    }
+
+    // 書籍情報の削除用のRPCメソッド
+    rpc Delete(DeleteRequest) returns (DeleteResponse){
+        option (google.api.http) = {
+            delete: "/book/{id}"
+        };
+    }
+}
