@@ -1,4 +1,4 @@
-package main
+package repository
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
-	repo "github.com/smockoro/grpc-microservice-sample/pkg/repository/mysql/user"
 )
 
 func TestInsert(t *testing.T) {
@@ -16,15 +15,15 @@ func TestInsert(t *testing.T) {
 	}
 	defer db.Close()
 
-	user := &api.User{Name: "Bob", Age: 11, Mail: "sample@sample.com", Address: "Tokyo"}
+	item := &api.Item{Name: "Apple", Description: "Red Apple", Price: 120}
 
-	mock.ExpectExec("INSERT INTO users").
-		WithArgs(user.Name, user.Age, user.Mail, user.Address).
+	mock.ExpectExec("INSERT INTO items").
+		WithArgs(item.Name, item.Description, item.Price).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	ur := repo.NewUserRepository(db)
+	ur := NewItemRepository(db)
 	ctx := context.Background()
-	if _, err = ur.Insert(ctx, user); err != nil {
+	if _, err = ur.Insert(ctx, item); err != nil {
 		t.Errorf("error was not expected while Insert stats: %s", err)
 	}
 }
@@ -36,14 +35,13 @@ func TestSelectByID(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "age", "mail", "address"}).
-		AddRow(1, "Bob", 11, "sample@sample.com", "Tokyo")
-		//AddRow(2, "Alice", 13, "example@sample.com", "London")
+	rows := sqlmock.NewRows([]string{"id", "name", "description", "price"}).
+		AddRow(1, "Apple", "Red Apple", 120)
 
-	mock.ExpectQuery("^SELECT (.+) FROM users WHERE").
+	mock.ExpectQuery("^SELECT (.+) FROM items WHERE").
 		WillReturnRows(rows)
 
-	ur := repo.NewUserRepository(db)
+	ur := NewItemRepository(db)
 	ctx := context.Background()
 	_, err = ur.SelectByID(ctx, 1)
 	if err != nil {
@@ -58,14 +56,14 @@ func TestSelectAll(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows := sqlmock.NewRows([]string{"id", "name", "age", "mail", "address"}).
-		AddRow(1, "Bob", 11, "sample@sample.com", "Tokyo").
-		AddRow(2, "Alice", 13, "example@sample.com", "London")
+	rows := sqlmock.NewRows([]string{"id", "name", "description", "price"}).
+		AddRow(1, "Apple", "Red Apple", 120).
+		AddRow(2, "Pen", "HB pencil", 100)
 
-	mock.ExpectQuery("^SELECT (.+) FROM users$").
+	mock.ExpectQuery("^SELECT (.+) FROM items$").
 		WillReturnRows(rows)
 
-	ur := repo.NewUserRepository(db)
+	ur := NewItemRepository(db)
 	ctx := context.Background()
 	if _, err = ur.SelectAll(ctx); err != nil {
 		t.Errorf("error was not expected while Select All stats: %s", err)
@@ -79,12 +77,12 @@ func TestUpdate(t *testing.T) {
 	}
 	defer db.Close()
 
-	user := &api.User{Id: 1, Name: "Bob Olimar", Age: 88, Mail: "aa@sample.com", Address: "Tokyo"}
-	mock.ExpectExec("UPDATE users SET").WillReturnResult(sqlmock.NewResult(1, 1))
+	item := &api.Item{Id: 1, Name: "Apple", Description: "Red Apple", Price: 500}
+	mock.ExpectExec("UPDATE items SET").WillReturnResult(sqlmock.NewResult(1, 1))
 
-	ur := repo.NewUserRepository(db)
+	ur := NewItemRepository(db)
 	ctx := context.Background()
-	if _, err = ur.Update(ctx, user); err != nil {
+	if _, err = ur.Update(ctx, item); err != nil {
 		t.Errorf("error was not expected while Update stats: %s", err)
 	}
 }
@@ -96,9 +94,9 @@ func TestDelete(t *testing.T) {
 	}
 	defer db.Close()
 
-	mock.ExpectExec("DELETE FROM users WHERE").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("DELETE FROM items WHERE").WillReturnResult(sqlmock.NewResult(1, 1))
 
-	ur := repo.NewUserRepository(db)
+	ur := NewItemRepository(db)
 	ctx := context.Background()
 	if _, err = ur.Delete(ctx, 1); err != nil {
 		t.Errorf("error was not expected while Delete stats: %s", err)
