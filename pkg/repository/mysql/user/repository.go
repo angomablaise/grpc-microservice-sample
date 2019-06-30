@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
 	repo "github.com/smockoro/grpc-microservice-sample/pkg/service/user/repository"
 	"google.golang.org/grpc/codes"
@@ -12,31 +12,17 @@ import (
 )
 
 type userRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewUserRepository(db *sql.DB) repo.UserRepository {
+func NewUserRepository(db *sqlx.DB) repo.UserRepository {
 	return &userRepository{db: db}
 }
 
-func (u *userRepository) connect(ctx context.Context) (*sql.Conn, error) {
-	c, err := u.db.Conn(ctx)
-	if err != nil {
-		return nil, status.Error(codes.Unknown, "User Database Connect Error"+err.Error())
-	}
-	return c, nil
-}
-
 func (u *userRepository) Insert(ctx context.Context, user *api.User) (int64, error) {
-	c, err := u.connect(ctx)
-	if err != nil {
-		return -1, err
-	}
-	defer c.Close()
-
-	res, err := c.ExecContext(ctx,
-		"INSERT INTO users(`name`, `age`, `mail`, `address`) VALUES(?, ?, ?, ?)",
-		user.Name, user.Age, user.Mail, user.Address)
+	res, err := u.db.NamedExecContext(ctx,
+		"INSERT INTO users(`name`, `age`, `mail`, `address`) VALUES(:name, :age, :mail, :address)",
+		user)
 	if err != nil {
 		return -1, status.Error(codes.Unknown, "failed to insert user"+err.Error())
 	}
@@ -50,13 +36,7 @@ func (u *userRepository) Insert(ctx context.Context, user *api.User) (int64, err
 }
 
 func (u *userRepository) SelectByID(ctx context.Context, id int64) (*api.User, error) {
-	c, err := u.connect(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer c.Close()
-
-	res, err := c.QueryContext(ctx,
+	res, err := u.db.QueryxContext(ctx,
 		"SELECT `id`, `name`, `age`, `mail`, `address` FROM users WHERE `id` = ?",
 		id)
 	if err != nil {
@@ -73,27 +53,15 @@ func (u *userRepository) SelectByID(ctx context.Context, id int64) (*api.User, e
 	}
 
 	var user api.User
-	if err := res.Scan(&user.Id, &user.Name, &user.Age, &user.Mail, &user.Address); err != nil {
+	if err := res.StructScan(&user); err != nil {
 		return nil, status.Error(codes.Unknown, err.Error())
 	}
 
-	return &api.User{
-		Id:      user.Id,
-		Name:    user.Name,
-		Age:     user.Age,
-		Mail:    user.Mail,
-		Address: user.Address,
-	}, nil
+	return &user, nil
 }
 
 func (u *userRepository) SelectAll(ctx context.Context) ([]*api.User, error) {
-	c, err := u.connect(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer c.Close()
-
-	rows, err := c.QueryContext(ctx, "SELECT `id`, `name`, `age`, `mail`, `address` FROM users")
+	rows, err := u.db.QueryxContext(ctx, "SELECT `id`, `name`, `age`, `mail`, `address` FROM users")
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to select "+err.Error())
 	}
@@ -101,11 +69,11 @@ func (u *userRepository) SelectAll(ctx context.Context) ([]*api.User, error) {
 
 	list := []*api.User{}
 	for rows.Next() {
-		user := new(api.User)
-		if err := rows.Scan(&user.Id, &user.Name, &user.Age, &user.Mail, &user.Address); err != nil {
+		var user api.User
+		if err := rows.StructScan(&user); err != nil {
 			return nil, status.Error(codes.Unknown, err.Error())
 		}
-		list = append(list, user)
+		list = append(list, &user)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -116,15 +84,9 @@ func (u *userRepository) SelectAll(ctx context.Context) ([]*api.User, error) {
 }
 
 func (u *userRepository) Update(ctx context.Context, user *api.User) (int64, error) {
-	c, err := u.connect(ctx)
-	if err != nil {
-		return -1, err
-	}
-	defer c.Close()
-
-	res, err := c.ExecContext(ctx,
-		"UPDATE users SET `name`=?, `age`=?, `mail`=?, `address`=? WHERE `id`=?",
-		user.Name, user.Age, user.Mail, user.Address, user.Id)
+	res, err := u.db.NamedExecContext(ctx,
+		"UPDATE users SET `name`=:name, `age`=:age, `mail`=:mail, `address`=:address WHERE `id`=:id",
+		user)
 	if err != nil {
 		return -1, status.Error(codes.Unknown, "failed to update user"+err.Error())
 	}
@@ -143,13 +105,7 @@ func (u *userRepository) Update(ctx context.Context, user *api.User) (int64, err
 }
 
 func (u *userRepository) Delete(ctx context.Context, id int64) (int64, error) {
-	c, err := u.connect(ctx)
-	if err != nil {
-		return -1, err
-	}
-	defer c.Close()
-
-	res, err := c.ExecContext(ctx, "DELETE FROM users WHERE `id`=?", id)
+	res, err := u.db.ExecContext(ctx, "DELETE FROM users WHERE `id`=:id", id)
 	if err != nil {
 		return -1, status.Error(codes.Unknown, "failed to delete "+err.Error())
 	}
