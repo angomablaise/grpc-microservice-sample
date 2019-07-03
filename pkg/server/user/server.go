@@ -1,43 +1,28 @@
 package server
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net"
-	"os"
 
-	_ "github.com/go-sql-driver/mysql" // Register MySQL Driver
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
+	"github.com/smockoro/grpc-microservice-sample/pkg/config/user"
 	repo "github.com/smockoro/grpc-microservice-sample/pkg/repository/mysql/user"
 	"github.com/smockoro/grpc-microservice-sample/pkg/service/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-type Config struct {
-	Port       string
-	DBHost     string
-	DBUser     string
-	DBPassword string
-	DBSchema   string
-}
-
+// RunServer : Component Injected and Startup gRPC Server
 func RunServer() error {
-	cfg := getConfig()
+	cfg := config.NewConfig()
 
 	lis, err := net.Listen("tcp", ":"+cfg.Port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s",
-		cfg.DBUser,
-		cfg.DBPassword,
-		cfg.DBHost,
-		cfg.DBSchema)
-
-	db, err := sql.Open("mysql", dsn)
+	db, err := ConnectDB(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to open database: %v", err)
 	}
@@ -56,16 +41,4 @@ func RunServer() error {
 		return err
 	}
 	return nil
-}
-
-func getConfig() Config {
-
-	var cfg Config
-	cfg.Port = os.Getenv("GRPC_PORT")
-	cfg.DBHost = os.Getenv("DB_HOST")
-	cfg.DBUser = os.Getenv("DB_USER")
-	cfg.DBPassword = os.Getenv("DB_PASSWORD")
-	cfg.DBSchema = os.Getenv("DB_SCHEMA")
-
-	return cfg
 }
