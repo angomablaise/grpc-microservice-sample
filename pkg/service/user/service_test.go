@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
 	srv "github.com/smockoro/grpc-microservice-sample/pkg/service/user"
-	mock "github.com/smockoro/grpc-microservice-sample/testdata"
+	mock "github.com/smockoro/grpc-microservice-sample/testdata/mock/repository"
 )
 
 func TestNewUserServiceServer(t *testing.T) {

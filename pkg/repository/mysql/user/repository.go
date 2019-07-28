@@ -105,7 +105,7 @@ func (u *userRepository) Update(ctx context.Context, user *api.User) (int64, err
 }
 
 func (u *userRepository) Delete(ctx context.Context, id int64) (int64, error) {
-	res, err := u.db.ExecContext(ctx, "DELETE FROM users WHERE `id`=:id", id)
+	res, err := u.db.ExecContext(ctx, "DELETE FROM users WHERE `id`= ?", id)
 	if err != nil {
 		return -1, status.Error(codes.Unknown, "failed to delete "+err.Error())
 	}

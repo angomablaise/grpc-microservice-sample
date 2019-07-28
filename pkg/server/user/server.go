@@ -1,15 +1,22 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware"
+	"github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	"github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
 	"github.com/smockoro/grpc-microservice-sample/pkg/config/user"
 	repo "github.com/smockoro/grpc-microservice-sample/pkg/repository/mysql/user"
 	"github.com/smockoro/grpc-microservice-sample/pkg/service/user"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -30,7 +37,19 @@ func RunServer() error {
 
 	repo := repo.NewUserRepository(db)
 	server := user.NewUserServiceServer(repo)
-	s := grpc.NewServer()
+
+	opts := []grpc_zap.Option{}
+	zapLogger, _ := zap.NewProduction()
+	grpc_zap.ReplaceGrpcLogger(zapLogger)
+
+	s := grpc.NewServer(
+		grpc_middleware.WithUnaryServerChain(
+			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(
+				grpc_ctxtags.CodeGenRequestFieldExtractor)),
+			grpc_zap.UnaryServerInterceptor(zapLogger, opts...),
+			grpc_auth.UnaryServerInterceptor(tokenAuthentication),
+		),
+	)
 
 	api.RegisterUserServiceServer(s, server)
 	reflection.Register(s)
@@ -41,4 +60,16 @@ func RunServer() error {
 		return err
 	}
 	return nil
+}
+
+func tokenAuthentication(ctx context.Context) (context.Context, error) {
+	token, err := grpc_auth.AuthFromMD(ctx, "bearer")
+	if err != nil {
+		return nil, err
+	}
+	if token != "sample_token" {
+		return nil, grpc.Errorf(codes.Unauthenticated, "invalid token")
+	}
+	newCtx := context.WithValue(ctx, "authentication", "ok")
+	return newCtx, nil
 }
