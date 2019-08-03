@@ -5,7 +5,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql" // Register MySQL Driver
 	"github.com/jmoiron/sqlx"
-	"github.com/smockoro/grpc-microservice-sample/pkg/config/user"
+	config "github.com/smockoro/grpc-microservice-sample/pkg/config/user"
 )
 
 // ConnectDB : connect to mysql server
