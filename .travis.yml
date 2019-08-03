@@ -16,7 +16,7 @@ before_install:
     - sudo mv docker-compose /usr/local/bin
     - export top=`pwd`
     - cd ./docker/user-service/mysql
-    - docker-compose up -d
+    - docker-compose up -d db
     - cd $top
 
 script:
