@@ -14,41 +14,41 @@ func TestNewConfig(t *testing.T) {
 		errorIsNil bool
 	}{
 		{name: "env value not loss", values: map[string]string{
-			"GRPC_PORT":  "9000",
-			"DBHost":     "localhost:9000",
-			"DBUser":     "connect_user",
-			"DBPassword": "password",
-			"DBSchema":   "shema"}, errorIsNil: false},
+			"GRPC_PORT":   "9000",
+			"DB_HOST":     "localhost:9000",
+			"DB_USER":     "connect_user",
+			"DB_PASSWORD": "password",
+			"DB_SCHEMA":   "shema"}, errorIsNil: false},
 		{name: "GRPC_PORT is lost", values: map[string]string{
-			"GRPC_PORT":  "",
-			"DBHost":     "localhost:9000",
-			"DBUser":     "connect_user",
-			"DBPassword": "password",
-			"DBSchema":   "shema"}, errorIsNil: false},
-		{name: "DBHost is lost", values: map[string]string{
-			"GRPC_PORT":  "9000",
-			"DBHost":     "",
-			"DBUser":     "connect_user",
-			"DBPassword": "password",
-			"DBSchema":   "shema"}, errorIsNil: false},
-		{name: "DBUser is lost", values: map[string]string{
-			"GRPC_PORT":  "9000",
-			"DBHost":     "localhost:9000",
-			"DBUser":     "",
-			"DBPassword": "password",
-			"DBSchema":   "shema"}, errorIsNil: false},
-		{name: "DBPassword is lost", values: map[string]string{
-			"GRPC_PORT":  "9000",
-			"DBHost":     "localhost:9000",
-			"DBUser":     "connect_user",
-			"DBPassword": "",
-			"DBSchema":   "shema"}, errorIsNil: false},
-		{name: "DBSchema is lost", values: map[string]string{
-			"GRPC_PORT":  "9000",
-			"DBHost":     "localhost:9000",
-			"DBUser":     "connect_user",
-			"DBPassword": "password",
-			"DBSchema":   ""}, errorIsNil: false},
+			"GRPC_PORT":   "",
+			"DB_HOST":     "localhost:9000",
+			"DB_USER":     "connect_user",
+			"DB_PASSWORD": "password",
+			"DB_SCHEMA":   "shema"}, errorIsNil: false},
+		{name: "DB_HOST is lost", values: map[string]string{
+			"GRPC_PORT":   "9000",
+			"DB_HOST":     "",
+			"DB_USER":     "connect_user",
+			"DB_PASSWORD": "password",
+			"DB_SCHEMA":   "shema"}, errorIsNil: false},
+		{name: "DB_USER is lost", values: map[string]string{
+			"GRPC_PORT":   "9000",
+			"DB_HOST":     "localhost:9000",
+			"DB_USER":     "",
+			"DB_PASSWORD": "password",
+			"DB_SCHEMA":   "shema"}, errorIsNil: false},
+		{name: "DB_PASSWORD is lost", values: map[string]string{
+			"GRPC_PORT":   "9000",
+			"DB_HOST":     "localhost:9000",
+			"DB_USER":     "connect_user",
+			"DB_PASSWORD": "",
+			"DB_SCHEMA":   "shema"}, errorIsNil: false},
+		{name: "DB_SCHEMA is lost", values: map[string]string{
+			"GRPC_PORT":   "9000",
+			"DB_HOST":     "localhost:9000",
+			"DB_USER":     "connect_user",
+			"DB_PASSWORD": "password",
+			"DB_SCHEMA":   ""}, errorIsNil: false},
 	}
 
 	for _, c := range cases {
