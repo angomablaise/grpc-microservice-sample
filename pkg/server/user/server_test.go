@@ -2,17 +2,23 @@ package server_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
 
 	userpb "github.com/smockoro/grpc-microservice-sample/pkg/api"
-	"github.com/smockoro/grpc-microservice-sample/pkg/server/user"
+	server "github.com/smockoro/grpc-microservice-sample/pkg/server/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
 func TestRunServer(t *testing.T) {
+	fmt.Println(os.Getenv("GRPC_PORT"))
+	fmt.Println(os.Getenv("DB_HOST"))
+	fmt.Println(os.Getenv("DB_PASSWORD"))
+	fmt.Println(os.Getenv("DB_USER"))
+	fmt.Println(os.Getenv("DB_PASSWORD"))
 	go server.RunServer()
 	time.Sleep(1 * time.Second) // Server Start uping
 
