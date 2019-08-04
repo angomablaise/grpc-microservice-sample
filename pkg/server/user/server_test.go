@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	userpb "github.com/smockoro/grpc-microservice-sample/pkg/api"
 	server "github.com/smockoro/grpc-microservice-sample/pkg/server/user"
 	"google.golang.org/grpc"
@@ -199,7 +200,7 @@ func TestTokenAuthentication(t *testing.T) {
 		{name: "No authorization Header", f: func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
-			nCtx, err := server.ExportTokenAuthentication(ctx)
+			_, err := server.ExportTokenAuthentication(ctx)
 
 			if err == nil {
 				t.Errorf("It is expected that err is not nil(auth error) but err is nil")
@@ -210,7 +211,7 @@ func TestTokenAuthentication(t *testing.T) {
 			defer cancel()
 			ctx = ctxWithToken(ctx, "bearer", "")
 
-			nCtx, err := server.ExportTokenAuthentication(ctx)
+			_, err := server.ExportTokenAuthentication(ctx)
 			if err == nil {
 				t.Errorf("It is expected that err is not nil(auth error) but err is nil")
 			}
@@ -220,7 +221,7 @@ func TestTokenAuthentication(t *testing.T) {
 			defer cancel()
 			ctx = ctxWithToken(ctx, "bearer", "bad_token")
 
-			nCtx, err := server.ExportTokenAuthentication(ctx)
+			_, err := server.ExportTokenAuthentication(ctx)
 			if err == nil {
 				t.Errorf("It is expected that err is not nil(auth error) but err is nil")
 			}
@@ -230,16 +231,16 @@ func TestTokenAuthentication(t *testing.T) {
 			defer cancel()
 			ctx = ctxWithToken(ctx, "bearer", "sample_token")
 
-			nCtx, err := server.ExportTokenAuthentication(ctx)
+			_, err := server.ExportTokenAuthentication(ctx)
 			if err != nil {
 				t.Errorf("It is expected that err is nil but err is %v", err)
 			}
 		}},
 	}
 
+	t.Parallel()
 	for _, c := range cases {
 		c := c
-		t.Parallel()
 		t.Run(c.name, c.f)
 	}
 
