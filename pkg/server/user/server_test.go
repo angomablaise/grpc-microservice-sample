@@ -14,11 +14,6 @@ import (
 )
 
 func TestRunServer(t *testing.T) {
-	fmt.Println(os.Getenv("GRPC_PORT"))
-	fmt.Println(os.Getenv("DB_HOST"))
-	fmt.Println(os.Getenv("DB_PASSWORD"))
-	fmt.Println(os.Getenv("DB_USER"))
-	fmt.Println(os.Getenv("DB_PASSWORD"))
 	go server.RunServer()
 	time.Sleep(1 * time.Second) // Server Start uping
 
@@ -194,4 +189,64 @@ func testGetId(t *testing.T, client userpb.UserServiceClient) int64 {
 	}
 
 	return resp.Users[len(resp.Users)-1].Id
+}
+
+func TestTokenAuthentication(t *testing.T) {
+	cases := []struct {
+		name string
+		f    func(t *testing.T)
+	}{
+		{name: "No authorization Header", f: func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			nCtx, err := server.ExportTokenAuthentication(ctx)
+
+			if err == nil {
+				t.Errorf("It is expected that err is not nil(auth error) but err is nil")
+			}
+		}},
+		{name: "Authorization Header is blank", f: func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			ctx = ctxWithToken(ctx, "bearer", "")
+
+			nCtx, err := server.ExportTokenAuthentication(ctx)
+			if err == nil {
+				t.Errorf("It is expected that err is not nil(auth error) but err is nil")
+			}
+		}},
+		{name: "Authorization Header is Bad Token", f: func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			ctx = ctxWithToken(ctx, "bearer", "bad_token")
+
+			nCtx, err := server.ExportTokenAuthentication(ctx)
+			if err == nil {
+				t.Errorf("It is expected that err is not nil(auth error) but err is nil")
+			}
+		}},
+		{name: "Authorization Header is Bad Token", f: func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			defer cancel()
+			ctx = ctxWithToken(ctx, "bearer", "sample_token")
+
+			nCtx, err := server.ExportTokenAuthentication(ctx)
+			if err != nil {
+				t.Errorf("It is expected that err is nil but err is %v", err)
+			}
+		}},
+	}
+
+	for _, c := range cases {
+		c := c
+		t.Parallel()
+		t.Run(c.name, c.f)
+	}
+
+}
+
+func ctxWithToken(ctx context.Context, scheme string, token string) context.Context {
+	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", scheme, token))
+	nCtx := metautils.NiceMD(md).ToOutgoing(ctx)
+	return nCtx
 }
