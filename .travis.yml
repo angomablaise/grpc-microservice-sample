@@ -18,6 +18,7 @@ before_install:
     - cd ./docker/user-service/mysql
     - docker-compose up -d db
     - cd $top
+    - docker ps
 
 script:
     - go test ./... -covermode=count -coverprofile=profile.cov
