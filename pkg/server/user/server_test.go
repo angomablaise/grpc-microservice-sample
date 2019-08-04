@@ -89,7 +89,7 @@ func TestRunServer(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
 
-			id := testGetId(t, client)
+			id := testGetID(t, client)
 			_, err := client.Update(ctx, &userpb.UpdateUserRequest{
 				User: &userpb.User{
 					Id:      id,
@@ -109,7 +109,7 @@ func TestRunServer(t *testing.T) {
 			defer cancel()
 
 			ctx = metadata.AppendToOutgoingContext(ctx, "Authorization", "bearer sample_token")
-			id := testGetId(t, client)
+			id := testGetID(t, client)
 			_, err := client.Update(ctx, &userpb.UpdateUserRequest{
 				User: &userpb.User{
 					Id:      id,
@@ -128,7 +128,7 @@ func TestRunServer(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
 
-			id := testGetId(t, client)
+			id := testGetID(t, client)
 			_, err := client.Get(ctx, &userpb.GetUserRequest{Id: id})
 
 			if err == nil {
@@ -140,7 +140,7 @@ func TestRunServer(t *testing.T) {
 			defer cancel()
 
 			ctx = metadata.AppendToOutgoingContext(ctx, "Authorization", "bearer sample_token")
-			id := testGetId(t, client)
+			id := testGetID(t, client)
 			_, err := client.Get(ctx, &userpb.GetUserRequest{Id: id})
 
 			if err != nil {
@@ -151,7 +151,7 @@ func TestRunServer(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
 
-			id := testGetId(t, client)
+			id := testGetID(t, client)
 			_, err := client.Delete(ctx, &userpb.DeleteUserRequest{Id: id})
 
 			if err == nil {
@@ -163,7 +163,7 @@ func TestRunServer(t *testing.T) {
 			defer cancel()
 
 			ctx = metadata.AppendToOutgoingContext(ctx, "Authorization", "bearer sample_token")
-			id := testGetId(t, client)
+			id := testGetID(t, client)
 			_, err := client.Delete(ctx, &userpb.DeleteUserRequest{Id: id})
 
 			if err != nil {
@@ -177,7 +177,7 @@ func TestRunServer(t *testing.T) {
 	}
 }
 
-func testGetId(t *testing.T, client userpb.UserServiceClient) int64 {
+func testGetID(t *testing.T, client userpb.UserServiceClient) int64 {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -226,10 +226,11 @@ func TestTokenAuthentication(t *testing.T) {
 				t.Errorf("It is expected that err is not nil(auth error) but err is nil")
 			}
 		}},
-		{name: "Authorization Header is Bad Token", f: func(t *testing.T) {
+		{name: "Authorization Header is Ok", f: func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 			defer cancel()
 			ctx = ctxWithToken(ctx, "bearer", "sample_token")
+			t.Logf("%v", ctx)
 
 			_, err := server.ExportTokenAuthentication(ctx)
 			if err != nil {
