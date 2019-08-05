@@ -18,6 +18,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 )
 
 // RunServer : Component Injected and Startup gRPC Server
@@ -68,7 +69,7 @@ func tokenAuthentication(ctx context.Context) (context.Context, error) {
 		return nil, err
 	}
 	if token != "sample_token" {
-		return nil, grpc.Errorf(codes.Unauthenticated, "invalid token")
+		return nil, status.Errorf(codes.Unauthenticated, "invalid token")
 	}
 	newCtx := context.WithValue(ctx, "authentication", "ok")
 	return newCtx, nil

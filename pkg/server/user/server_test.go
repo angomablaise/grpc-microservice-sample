@@ -248,7 +248,8 @@ func TestTokenAuthentication(t *testing.T) {
 }
 
 func ctxWithToken(ctx context.Context, scheme string, token string) context.Context {
-	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", scheme, token))
-	nCtx := metautils.NiceMD(md).ToOutgoing(ctx)
+	AUTHORIZATION := "authorization"
+	md := metadata.Pairs(AUTHORIZATION, fmt.Sprintf("%s %v", scheme, token))
+	nCtx := metautils.NiceMD(md).ToIncoming(ctx)
 	return nCtx
 }
