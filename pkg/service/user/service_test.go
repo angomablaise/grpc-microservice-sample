@@ -122,7 +122,39 @@ func TestGet(t *testing.T) {
 	defer ctrl.Finish()
 
 	repo := mock.NewMockUserRepository(ctrl)
-	_ = srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo)
+
+	cases := []struct {
+		name string
+		f    func(t *testing.T)
+	}{
+		{name: "Get OK", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			reqID := 1
+			user := &api.User{Name: "Bob", Age: 16, Mail: "sample@sample.com", Address: "Tokyo"}
+			req := &api.GetUserRequest{Id: int64(reqID)}
+			repo.EXPECT().SelectByID(ctx, int64(reqID)).Return(user, nil)
+			_, err := s.Get(ctx, req)
+			if err != nil {
+				t.Errorf("want %s actual %s", "nil", err)
+			}
+		}},
+		{name: "Get NG", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			req := &api.GetUserRequest{}
+			repo.EXPECT().SelectByID(ctx, int64(0)).Return(nil, fmt.Errorf("Error"))
+			_, err := s.Get(ctx, req)
+			if err == nil {
+				t.Errorf("want %s actual %s", err, "nil")
+			}
+		}},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, c.f)
+	}
 
 }
 
@@ -131,7 +163,45 @@ func TestUpdate(t *testing.T) {
 	defer ctrl.Finish()
 
 	repo := mock.NewMockUserRepository(ctrl)
-	_ = srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo)
+
+	cases := []struct {
+		name string
+		f    func(t *testing.T)
+	}{
+		{name: "Update OK", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			user := &api.User{
+				Id:      1,
+				Name:    "Bob",
+				Age:     16,
+				Mail:    "sample@sample.com",
+				Address: "Tokyo",
+			}
+			req := &api.UpdateUserRequest{User: user}
+			repo.EXPECT().Update(ctx, user).Return(int64(1), nil)
+			_, err := s.Update(ctx, req)
+			if err != nil {
+				t.Errorf("want %s actual %s", "nil", err)
+			}
+		}},
+		{name: "Update NG", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			user := &api.User{}
+			req := &api.UpdateUserRequest{User: user}
+			repo.EXPECT().Update(ctx, user).Return(int64(0), fmt.Errorf("Error"))
+			_, err := s.Update(ctx, req)
+			if err == nil {
+				t.Errorf("want %s actual %s", err, "nil")
+			}
+		}},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, c.f)
+	}
 
 }
 
@@ -140,7 +210,39 @@ func TestDelete(t *testing.T) {
 	defer ctrl.Finish()
 
 	repo := mock.NewMockUserRepository(ctrl)
-	_ = srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo)
+
+	cases := []struct {
+		name string
+		f    func(t *testing.T)
+	}{
+		{name: "Delete OK", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			reqID := 1
+			req := &api.DeleteUserRequest{Id: int64(reqID)}
+			repo.EXPECT().Delete(ctx, int64(reqID)).Return(int64(1), nil)
+			_, err := s.Delete(ctx, req)
+			if err != nil {
+				t.Errorf("want %s actual %s", "nil", err)
+			}
+		}},
+		{name: "Delete NG", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			reqID := 0
+			req := &api.DeleteUserRequest{Id: int64(reqID)}
+			repo.EXPECT().Delete(ctx, int64(reqID)).Return(int64(0), fmt.Errorf("Error"))
+			_, err := s.Delete(ctx, req)
+			if err == nil {
+				t.Errorf("want %s actual %s", err, "nil")
+			}
+		}},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, c.f)
+	}
 }
 
 func TestGetAll(t *testing.T) {
@@ -148,6 +250,52 @@ func TestGetAll(t *testing.T) {
 	defer ctrl.Finish()
 
 	repo := mock.NewMockUserRepository(ctrl)
-	_ = srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo)
+
+	cases := []struct {
+		name string
+		f    func(t *testing.T)
+	}{
+		{name: "GetAll OK", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			users := []*api.User{
+				&api.User{
+					Id:      1,
+					Name:    "Bob",
+					Age:     11,
+					Mail:    "sample@sample.com",
+					Address: "Tokyo",
+				},
+				&api.User{
+					Id:      2,
+					Name:    "Alice",
+					Age:     13,
+					Mail:    "example@sample.com",
+					Address: "London",
+				},
+			}
+			req := &api.GetAllUserRequest{}
+			repo.EXPECT().SelectAll(ctx).Return(users, nil)
+			_, err := s.GetAll(ctx, req)
+			if err != nil {
+				t.Errorf("want %s actual %s", "nil", err)
+			}
+		}},
+		{name: "GetAll NG", f: func(t *testing.T) {
+			t.Parallel()
+			ctx := context.Background()
+			req := &api.GetAllUserRequest{}
+			repo.EXPECT().SelectAll(ctx).Return(nil, fmt.Errorf("Error"))
+			_, err := s.GetAll(ctx, req)
+			if err == nil {
+				t.Errorf("want %s actual %s", err, "nil")
+			}
+		}},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, c.f)
+	}
 
 }
