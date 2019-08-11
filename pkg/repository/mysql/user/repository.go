@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
 	repo "github.com/smockoro/grpc-microservice-sample/pkg/service/user/repository"
+	"go.opencensus.io/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -15,11 +16,15 @@ type userRepository struct {
 	db *sqlx.DB
 }
 
+// NewUserRepository : return User Repository for mysql
 func NewUserRepository(db *sqlx.DB) repo.UserRepository {
 	return &userRepository{db: db}
 }
 
 func (u *userRepository) Insert(ctx context.Context, user *api.User) (int64, error) {
+	ctx, span := trace.StartSpan(ctx, "oc.user-service.repository.insert")
+	defer span.End()
+
 	res, err := u.db.NamedExecContext(ctx,
 		"INSERT INTO users(`name`, `age`, `mail`, `address`) VALUES(:name, :age, :mail, :address)",
 		user)
@@ -36,6 +41,9 @@ func (u *userRepository) Insert(ctx context.Context, user *api.User) (int64, err
 }
 
 func (u *userRepository) SelectByID(ctx context.Context, id int64) (*api.User, error) {
+	ctx, span := trace.StartSpan(ctx, "oc.user-service.repository.selectbyid")
+	defer span.End()
+
 	res, err := u.db.QueryxContext(ctx,
 		"SELECT `id`, `name`, `age`, `mail`, `address` FROM users WHERE `id` = ?",
 		id)
@@ -61,6 +69,10 @@ func (u *userRepository) SelectByID(ctx context.Context, id int64) (*api.User, e
 }
 
 func (u *userRepository) SelectAll(ctx context.Context) ([]*api.User, error) {
+	ctx, span := trace.StartSpan(ctx, "oc.user-service.repository.selectall")
+	defer span.End()
+	fmt.Printf("%v\n", span)
+
 	rows, err := u.db.QueryxContext(ctx, "SELECT `id`, `name`, `age`, `mail`, `address` FROM users")
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "failed to select "+err.Error())
@@ -84,6 +96,9 @@ func (u *userRepository) SelectAll(ctx context.Context) ([]*api.User, error) {
 }
 
 func (u *userRepository) Update(ctx context.Context, user *api.User) (int64, error) {
+	ctx, span := trace.StartSpan(ctx, "oc.user-service.repository.update")
+	defer span.End()
+
 	res, err := u.db.NamedExecContext(ctx,
 		"UPDATE users SET `name`=:name, `age`=:age, `mail`=:mail, `address`=:address WHERE `id`=:id",
 		user)
@@ -105,6 +120,9 @@ func (u *userRepository) Update(ctx context.Context, user *api.User) (int64, err
 }
 
 func (u *userRepository) Delete(ctx context.Context, id int64) (int64, error) {
+	ctx, span := trace.StartSpan(ctx, "oc.user-service.repository.delete")
+	defer span.End()
+
 	res, err := u.db.ExecContext(ctx, "DELETE FROM users WHERE `id`= ?", id)
 	if err != nil {
 		return -1, status.Error(codes.Unknown, "failed to delete "+err.Error())

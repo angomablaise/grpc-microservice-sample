@@ -12,8 +12,11 @@ import (
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
 	config "github.com/smockoro/grpc-microservice-sample/pkg/config/user"
+	"github.com/smockoro/grpc-microservice-sample/pkg/middleware/tracing"
 	repo "github.com/smockoro/grpc-microservice-sample/pkg/repository/mysql/user"
 	"github.com/smockoro/grpc-microservice-sample/pkg/service/user"
+	"go.opencensus.io/plugin/ocgrpc"
+	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -36,6 +39,13 @@ func RunServer() error {
 	}
 	defer db.Close()
 
+	exporter, err := tracing.NewExporter()
+	if err != nil {
+		return fmt.Errorf("failed to connect tracing agent or collector: %v", err)
+	}
+	trace.RegisterExporter(exporter)
+	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+
 	repo := repo.NewUserRepository(db)
 	server := user.NewUserServiceServer(repo)
 
@@ -44,6 +54,7 @@ func RunServer() error {
 	grpc_zap.ReplaceGrpcLogger(zapLogger)
 
 	s := grpc.NewServer(
+		grpc.StatsHandler(&ocgrpc.ServerHandler{}),
 		grpc_middleware.WithUnaryServerChain(
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(
 				grpc_ctxtags.CodeGenRequestFieldExtractor)),

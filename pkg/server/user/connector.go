@@ -1,8 +1,10 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 
+	"contrib.go.opencensus.io/integrations/ocsql"
 	_ "github.com/go-sql-driver/mysql" // Register MySQL Driver
 	"github.com/jmoiron/sqlx"
 	config "github.com/smockoro/grpc-microservice-sample/pkg/config/user"
@@ -28,5 +30,16 @@ func ConnectDB(cfg *config.Config) (*sqlx.DB, error) {
 		cfg.DBPassword,
 		cfg.DBHost,
 		cfg.DBSchema)
-	return sqlx.Open("mysql", dsn)
+
+	driverName, err := ocsql.Register("mysql", ocsql.WithAllTraceOptions())
+	if err != nil {
+		return nil, fmt.Errorf("driver not created")
+	}
+
+	db, err := sql.Open(driverName, dsn)
+	if err != nil {
+		return nil, fmt.Errorf("can't open database")
+	}
+
+	return sqlx.NewDb(db, "mysql"), nil
 }
