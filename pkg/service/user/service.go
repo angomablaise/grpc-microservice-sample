@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
 	repo "github.com/smockoro/grpc-microservice-sample/pkg/service/user/repository"
@@ -69,7 +68,6 @@ func (s *server) Delete(ctx context.Context, req *api.DeleteUserRequest) (*api.D
 func (s *server) GetAll(ctx context.Context, req *api.GetAllUserRequest) (*api.GetAllUserResponse, error) {
 	ctx, span := trace.StartSpan(ctx, "oc.user-service.service.getall")
 	defer span.End()
-	fmt.Printf("%v\n", span)
 
 	users, err := s.repo.SelectAll(ctx)
 	if err != nil {

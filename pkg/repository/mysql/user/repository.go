@@ -71,7 +71,6 @@ func (u *userRepository) SelectByID(ctx context.Context, id int64) (*api.User, e
 func (u *userRepository) SelectAll(ctx context.Context) ([]*api.User, error) {
 	ctx, span := trace.StartSpan(ctx, "oc.user-service.repository.selectall")
 	defer span.End()
-	fmt.Printf("%v\n", span)
 
 	rows, err := u.db.QueryxContext(ctx, "SELECT `id`, `name`, `age`, `mail`, `address` FROM users")
 	if err != nil {

@@ -1,7 +1,6 @@
 package tracing
 
 import (
-	"fmt"
 	"os"
 
 	"contrib.go.opencensus.io/exporter/jaeger"
@@ -11,9 +10,6 @@ import (
 func NewExporter() (*jaeger.Exporter, error) {
 	agentEndpointURI := os.Getenv("OT_AGENT_URI")
 	collectorEndpointURI := os.Getenv("OT_COL_URI")
-
-	fmt.Println(agentEndpointURI)
-	fmt.Println(collectorEndpointURI)
 
 	je, err := jaeger.NewExporter(jaeger.Options{
 		AgentEndpoint:     agentEndpointURI,
