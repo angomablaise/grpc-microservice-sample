@@ -16,7 +16,9 @@ type userRepository struct {
 }
 
 func NewUserRepository(db *sqlx.DB) repo.UserRepository {
-	return &userRepository{db: db}
+	return &userRepository{
+		db: db,
+	}
 }
 
 func (u *userRepository) Insert(ctx context.Context, user *api.User) (int64, error) {

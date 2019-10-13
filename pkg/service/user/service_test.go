@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
+	"github.com/smockoro/grpc-microservice-sample/pkg/lib"
 	srv "github.com/smockoro/grpc-microservice-sample/pkg/service/user"
 	mock "github.com/smockoro/grpc-microservice-sample/testdata/mock/repository"
 )
@@ -16,8 +17,9 @@ func TestNewUserServiceServer(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	stackTracer := lib.NewStackTracer()
 	repo := mock.NewMockUserRepository(ctrl)
-	s := srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo, stackTracer)
 
 	if reflect.TypeOf(s).String() != "*user.server" {
 		t.Errorf("want %s but actual %s", "*user.server", reflect.TypeOf(s))
@@ -28,8 +30,9 @@ func TestCreate(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	stackTracer := lib.NewStackTracer()
 	repo := mock.NewMockUserRepository(ctrl)
-	s := srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo, stackTracer)
 
 	users := map[string]*api.User{
 		"no lost data": &api.User{
@@ -121,8 +124,9 @@ func TestGet(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	stackTracer := lib.NewStackTracer()
 	repo := mock.NewMockUserRepository(ctrl)
-	s := srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo, stackTracer)
 
 	cases := []struct {
 		name string
@@ -162,8 +166,9 @@ func TestUpdate(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	stackTracer := lib.NewStackTracer()
 	repo := mock.NewMockUserRepository(ctrl)
-	s := srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo, stackTracer)
 
 	cases := []struct {
 		name string
@@ -209,8 +214,9 @@ func TestDelete(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	stackTracer := lib.NewStackTracer()
 	repo := mock.NewMockUserRepository(ctrl)
-	s := srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo, stackTracer)
 
 	cases := []struct {
 		name string
@@ -249,8 +255,9 @@ func TestGetAll(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	stackTracer := lib.NewStackTracer()
 	repo := mock.NewMockUserRepository(ctrl)
-	s := srv.NewUserServiceServer(repo)
+	s := srv.NewUserServiceServer(repo, stackTracer)
 
 	cases := []struct {
 		name string

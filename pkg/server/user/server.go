@@ -12,6 +12,7 @@ import (
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	"github.com/smockoro/grpc-microservice-sample/pkg/api"
 	config "github.com/smockoro/grpc-microservice-sample/pkg/config/user"
+	"github.com/smockoro/grpc-microservice-sample/pkg/lib"
 	repo "github.com/smockoro/grpc-microservice-sample/pkg/repository/mysql/user"
 	"github.com/smockoro/grpc-microservice-sample/pkg/service/user"
 	"go.uber.org/zap"
@@ -36,8 +37,9 @@ func RunServer() error {
 	}
 	defer db.Close()
 
+	stackTracer := lib.NewStackTracer()
 	repo := repo.NewUserRepository(db)
-	server := user.NewUserServiceServer(repo)
+	server := user.NewUserServiceServer(repo, stackTracer)
 
 	opts := []grpc_zap.Option{}
 	zapLogger, _ := zap.NewProduction()
